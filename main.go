@@ -52,13 +52,12 @@ func main() {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			server.StartServer(server.Configuration{
+			return server.StartServer(server.Configuration{
 				Hostname:        hostname,
 				Port:            port,
 				DefaultResource: defaultResource,
 				RootPath:        rootDir,
 			})
-			return nil
 		},
 	}
 	err := app.Run(os.Args)
