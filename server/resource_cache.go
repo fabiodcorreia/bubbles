@@ -18,7 +18,8 @@ func NewCache(files []ResourceFile) ResourceCache {
 		if err != nil {
 			log.Printf("Fail to get file content %s: %v", file.AbsPath, err)
 		}
-		rsrcs[file.RelPath], err = NewInMemoryResource(file.RelPath, content, "deflate")
+
+		rsrcs[file.RelPath], _ = NewInMemoryResource(file.RelPath, content)
 	}
 	return ResourceCache{
 		resources: rsrcs,
@@ -27,7 +28,6 @@ func NewCache(files []ResourceFile) ResourceCache {
 
 // GetResource return the in memory resource content
 func (cache ResourceCache) GetResource(name string) (InMemoryResource, error) {
-	//? if not exists?
 	if resource, found := cache.resources[name]; found {
 		return resource, nil
 	}

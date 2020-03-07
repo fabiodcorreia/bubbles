@@ -11,21 +11,24 @@ import (
 // ResourceType specifies the content type of the resource
 type ResourceType = string
 
-// CompressionType specifies the content compression type
-type CompressionType = string
+// Compression specifies the content compression type
+type Compression = string
+
+// CompressionDeflate compressionType deflate
+const CompressionDeflate = "deflate"
 
 // InMemoryResource hold the resouce that can be served by the server
 type InMemoryResource struct {
 	Name            string
 	Type            ResourceType
-	CompressionType CompressionType
+	CompressionType Compression
 	Size            int
 	InitialSize     int
 	Content         []byte
 }
 
 // NewInMemoryResource method will initialize a new InMemoryResource object and return it
-func NewInMemoryResource(name string, content []byte, compressionType CompressionType) (InMemoryResource, error) {
+func NewInMemoryResource(name string, content []byte) (InMemoryResource, error) {
 	compressedContent, err := compressResource(content)
 	if err != nil {
 		return InMemoryResource{}, err
@@ -36,7 +39,7 @@ func NewInMemoryResource(name string, content []byte, compressionType Compressio
 		Size:            len(compressedContent),
 		Content:         compressedContent,
 		Type:            mime.TypeByExtension(filepath.Ext(name)),
-		CompressionType: compressionType,
+		CompressionType: CompressionDeflate,
 	}, nil
 }
 
@@ -53,13 +56,13 @@ func (resource *InMemoryResource) String() string {
 
 // compressResource receives a []byte with the resource content and returns a compressed version
 func compressResource(content []byte) ([]byte, error) {
-	buf := new(bytes.Buffer)
-	flateWriter, _ := flate.NewWriter(buf, flate.BestCompression)
+	w := new(bytes.Buffer)
+	flateWriter, _ := flate.NewWriter(w, flate.BestCompression)
+	defer flateWriter.Close()
 	_, err := flateWriter.Write(content)
 	flateWriter.Flush()
 	if err != nil {
 		return nil, err
 	}
-	defer flateWriter.Close()
-	return buf.Bytes(), nil
+	return w.Bytes(), nil
 }

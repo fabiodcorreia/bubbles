@@ -23,18 +23,24 @@ help:
 	@echo "  make optimize-report  - Generate the optimization plan of the compiler"
 	@echo "  make clean            - Delete all the generate artifacts like the binary build and reports"
 	@echo "  make info             - Show the project information"
+	@echo "  make format           - Format the source code with gofmt"
 	@echo "*******************************************************************************************************"
+
+.PHONY: format
+format:
+	gofmt -s -w ./*/*.go
+	gofmt -s -w *.go
 
 # Build a production release of the application
 .PHONY: build
-build:
+build: format test
 	go mod tidy
 	go build -tags release \
 		-ldflags="-s -w -X 'main.version=$(VERSION)'" 
 
 # Run the application in development
 .PHONY: run
-run:
+run: format
 	go run main.go 
 
 # Run all the tests with coverage contage
@@ -44,8 +50,8 @@ test:
 
 # Run all the tests with coverage summary
 .PHONY: cov
-cov:
-	go test -coverprofile=$(COV_REPORT) $(PKG) -v
+cov: format
+	go test -coverprofile=$(COV_REPORT) $(PKG) -v -covermode=atomic $(PKG)
 	go tool cover -func=$(COV_REPORT)
 
 # Run all the tests with coverage summary and HTML report
@@ -72,7 +78,6 @@ profile:
 # make optimize-report | grep "leaking"
 opt-report:
 	go build -gcflags=-m=2 $(PKG) 2>&1
-	
 
 # Clean build, test, profile artifacts
 .PHONY: clean

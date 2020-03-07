@@ -5,14 +5,14 @@ import (
 )
 
 func TestGetResourceContentSuccess(t *testing.T) {
-	_, err := GetResourceContent("../tests/app/index.html")
+	_, err := GetResourceContent("../internal/test-app/index.html")
 	if err != nil {
 		t.Errorf("Expected %v, actual %v", "Error", err)
 	}
 }
 
 func TestGetResourceContentFileNotFound(t *testing.T) {
-	_, err := GetResourceContent("../tests/app/fake.txt")
+	_, err := GetResourceContent("../internal/test-app/fake.txt")
 	if err == nil {
 		t.Errorf("Expected %v, actual %v", "Error", err)
 	}

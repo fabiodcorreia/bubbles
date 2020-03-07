@@ -1,4 +1,4 @@
-# Ozone HTTP Server [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/fabiodcorreia/ozone/blob/master/LICENSE) 
+# Ozone HTTP Server [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/fabiodcorreia/ozone/blob/master/LICENSE) [![Go Report Card](https://goreportcard.com/badge/github.com/fabiodcorreia/ozone)](https://goreportcard.com/report/github.com/fabiodcorreia/ozone)
 
 Ozone is a minimalist Cloud Native HTTP Server to serve single page applications with no configuration and high performance.
 

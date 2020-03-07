@@ -41,11 +41,11 @@ func readyHandler(response http.ResponseWriter, request *http.Request) {
 }
 
 // StartServer starts the HTTP Server and loads the resources
-func StartServer(config Configuration) {
+func StartServer(config Configuration) error {
 	log.Printf("Ozone scanning resourses at %s\n", config.RootPath)
 	files, errFiles := SearchFiles(config.RootPath)
 	if errFiles != nil {
-		log.Fatal(errFiles)
+		return errFiles
 	}
 	log.Printf("Ozone found %d resources\n", len(files))
 	cache = NewCache(files)
@@ -56,7 +56,7 @@ func StartServer(config Configuration) {
 	fallback = config.DefaultResource
 
 	if !cache.Exists(fallback) {
-		log.Fatalf("Default resouce %s not found in resources\n", fallback)
+		return fmt.Errorf("Default resouce %s not found in resources", fallback)
 	}
 
 	http.HandleFunc("/", handler)
@@ -67,6 +67,7 @@ func StartServer(config Configuration) {
 
 	err := http.ListenAndServe(fmt.Sprintf("%s:%s", config.Hostname, config.Port), nil)
 	if err != nil {
-		log.Fatal("Ozone fail to start:", err)
+		return fmt.Errorf("Ozone fail to start: %v", err)
 	}
+	return nil
 }
