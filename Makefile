@@ -1,9 +1,15 @@
 #https://github.com/helm/helm/blob/master/Makefile
-GIT_COMMIT = $(shell git rev-parse HEAD)
-GIT_SHA    = $(shell git rev-parse --short HEAD)
-GIT_TAG    = $(shell git describe --tags --abbrev=0 --exact-match 2>/dev/null)
-GIT_DIRTY  = $(shell test -n "`git status --porcelain`" && echo "dirty" || echo "clean")
-VERSION    = $(shell git describe --tags --always --dirty --match=v* 2> /dev/null || echo v0)
+GIT_COMMIT 	= $(shell git rev-parse HEAD)
+GIT_SHA    	= $(shell git rev-parse --short HEAD)
+GIT_TAG    	= $(shell git describe --tags --abbrev=0 --exact-match 2>/dev/null)
+GIT_DIRTY  	= $(shell test -n "`git status --porcelain`" && echo "dirty" || echo "clean")
+
+ifdef BIN_VERSION
+	VERSION = $(BIN_VERSION)
+else
+	VERSION = $(shell git describe --tags --always --dirty --match=v* 2> /dev/null || echo v0)
+endif
+
 
 PKG          := ./...
 COV_REPORT   := coverage.out
@@ -24,6 +30,7 @@ help:
 	@echo "  make clean            - Delete all the generate artifacts like the binary build and reports"
 	@echo "  make info             - Show the project information"
 	@echo "  make format           - Format the source code with gofmt"
+	@echo "  make docker           - Create a Docker image for the application"
 	@echo "*******************************************************************************************************"
 
 .PHONY: format
@@ -33,7 +40,7 @@ format:
 
 # Build a production release of the application
 .PHONY: build
-build: format test
+build: 
 	go mod tidy
 	go build -tags release \
 		-ldflags="-s -w -X 'main.version=$(VERSION)'" 
@@ -84,6 +91,9 @@ opt-report:
 clean:
 	go clean
 	rm -f ozone main *.out *.test
+
+docker:
+	docker build -t ozone:${VERSION} --build-arg VERSION=$(VERSION) . 
 
 .PHONY: info
 info:
